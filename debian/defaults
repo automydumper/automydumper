@@ -1,0 +1,74 @@
+# Each item can be assigned as follows:
+# <variable>='<value>'
+
+# -- backupdir --
+# Directory that contains the backups
+# Default: backupdir='/var/backups/automydumper'
+
+# -- logdir --
+# Directory that contains the logs
+# Default: logdir='/var/log/automydumper'
+
+# -- compress --
+# Compress table dumps on-the-fly during backups
+# Default: compress=1
+
+# -- retention_daily --
+# How many daily backups do we keep?
+# Default: retention_daily=3
+
+# -- retention_weekly --
+# How many weekly backups do we keep?
+# Default: retention_weekly=0
+
+# -- retention_weekly_day --
+# What day should be marked as a weekly backup?
+# Default: retention_weekly_day=sunday
+
+# -- retention_monthly --
+# How many monthly backups do we keep?
+# Default: retention_monthly=0
+
+# -- mysql_user --
+# MySQL user that will be used to connect.
+# Default: mysql_user="root"
+
+# -- mysql_password --
+# MySQL password that will be used to connect. Leave empty for no password.
+# Default: empty
+
+# -- mysql_host --
+# Host of MySQL server.
+# Default: host=localhost
+
+# -- mysql_socket --
+# Unix socket on which MySQL listens when host is localhost or 127.0.0.1.
+# Default: mysql_socket=/var/run/mysqld/mysqld.sock
+
+# -- threads --
+# Amount of threads that will be used to backup the tables
+# Default: threads=4
+
+# -- mydumper_opts --
+# Extra options that will be passed on to mydumper.
+# Default: empty
+
+# -- enabled --
+# To disable the script, set value to 0. No backups will be taken.
+# Default: enabled=1
+
+# -- pre_command --
+# Command that will be executed BEFORE the actual backup. If the command fails, the backup will abort.
+# Default: empty
+
+# -- post_command --
+# Command that will be executed AFTER the actual backup. If the command fails, the backup will abort.
+# Default: empty
+
+# -- mail_rcpts --
+# Where to send email reports to. Email addresses should be comma separated, no spaces! Won't send any mails if empty.
+# Default: empty
+
+# -- mail_from --
+# Sender of the email report.
+# Default: automydumper@$HOSTNAME

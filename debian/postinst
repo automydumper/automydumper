@@ -1,0 +1,32 @@
+#!/bin/bash
+
+set -e
+
+if [ -e /etc/default/automydumper ] ; then
+	. /etc/default/automydumper
+fi
+
+if [ -z "${backupdir}" ] ; then
+	backupdir=/var/backups/automydumper
+fi
+
+mkdir -p "${backupdir}"
+chmod 0600 "${backupdir}"
+
+if [ -f /etc/cron.d/automydumper ]; then
+    minute="$(cat /etc/cron.d/automydumper | gawk '/([0-9]+)\s+([0-9]+).*\/usr\/sbin\/automydumper/ { print $1 }')"
+    hour="$(cat /etc/cron.d/automydumper | gawk '/([0-9]+)\s+([0-9]+).*\/usr\/sbin\/automydumper/ { print $2 }')"
+else
+    minute="$((RANDOM%59))"
+    hour="$((RANDOM%4))"
+fi
+
+cat <<EOF > /etc/cron.d/automydumper
+#
+# cron-job for automydumper
+#
+
+${minute} ${hour} * * * root /usr/sbin/automydumper &> /dev/null
+EOF
+
+#DEBHELPER#

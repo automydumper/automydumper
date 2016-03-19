@@ -1,0 +1,12 @@
+Source: automydumper
+Section: admin
+Priority: extra
+Maintainer: Bart Verwilst <bart@verwilst.be>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.5
+
+Package: automydumper
+Architecture: all
+Depends: ${misc:Depends}, mydumper (>= 0.9), gawk, heirloom-mailx
+Description: Daily backups for your MySQL server, backed by Mydumper
+Conflicts: automysqlbackup

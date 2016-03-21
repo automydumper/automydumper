@@ -9,4 +9,3 @@ Package: automydumper
 Architecture: all
 Depends: ${misc:Depends}, mydumper (>= 0.9), gawk, heirloom-mailx
 Description: Daily backups for your MySQL server, backed by Mydumper
-Conflicts: automysqlbackup

@@ -7,6 +7,8 @@ Configuration takes place in /etc/default/automydumper.
 ### Running Automydumper
 
 Running 'automydumper' ( or waiting for the cron ) is all you need to do to get an actual backup.
+By default, backups are placed in /var/backups/automydumper/<YYYY-mm-dd>.
+Running a backup multiple times on the same day deletes the previous backup of that day and recreates the folder above.
 
 ### Restoring backups
 

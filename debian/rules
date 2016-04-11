@@ -1,6 +1,13 @@
 #!/usr/bin/make -f
+
+DEB_VERSION_UPSTREAM := $(shell dpkg-parsechangelog | grep-dctrl -ensVersion -FSource .)
+
 %:
 	dh $@
+
+override_dh_auto_configure:
+	dh_auto_configure
+	sed -i s:"%buildNumber%":"$(DEB_VERSION_UPSTREAM)": automydumper
 
 override_dh_auto_install:
 	install -D -m 644 debian/defaults debian/automydumper/etc/default/automydumper

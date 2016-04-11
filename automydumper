@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 export PATH="$PATH:/bin:/usr/bin"
 
 # Defaults
@@ -15,7 +13,7 @@ retention_weekly_day='sunday'
 mysql_user='root'
 mysql_password=''
 mysql_host='localhost'
-mysql_socket='/var/run/mysqld/mysqld.sock'
+mysql_socket=
 threads=4
 mydumper_opts=''
 enabled=1
@@ -52,7 +50,7 @@ function mysql_credentials()
 
     echo "${mysql_host}" | grep -E "(localhost|127.0.0.1)" > /dev/null
     if [ $? -eq 0 ]; then
-        [ ! -z "${mysql_socket}" ] && echo -n "--socket=${mysql_socket}"
+        [ ${mysql_socket} ] && echo -n "--socket=${mysql_socket}" || echo -n ''
     else
         echo -n "--host=${mysql_host}"
     fi
@@ -209,6 +207,10 @@ run_pre_command
 [ -f "${backupdir}/${curdate}/metadata" ] && rm -rf "${backupdir}/${curdate}"
 
 mydumper ${mydumper_opts}
+if [ $? -ne 0 ]; then
+    echo "Backup failed."
+    exit 1
+fi
 
 # Run post_command if it is defined
 run_post_command
@@ -216,5 +218,3 @@ run_post_command
 cleanup_backups
 
 verify_backups
-
-

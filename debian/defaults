@@ -43,7 +43,8 @@
 
 # -- mysql_socket --
 # Unix socket on which MySQL listens when host is localhost or 127.0.0.1.
-# Default: mysql_socket=/var/run/mysqld/mysqld.sock
+# If left empty, it will use whatever [client] says in my.cnf
+# Default: mysql_socket=empty
 
 # -- threads --
 # Amount of threads that will be used to backup the tables

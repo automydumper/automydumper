@@ -6,7 +6,7 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  config.vm.box = "debian/jessie64"
+  config.vm.box = "boxcutter/debian82"
   config.ssh.forward_agent = true
 
   config.vm.provider "virtualbox" do |vb|

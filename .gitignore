@@ -1,3 +1,7 @@
 /vagrant/.vagrant
 /vagrant/.bundle
 /.idea
+debian/automydumper.debhelper.log
+debian/automydumper.substvars
+debian/automydumper/
+debian/files

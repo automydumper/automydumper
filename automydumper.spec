@@ -1,6 +1,6 @@
 Name: automydumper	
 Version: 1.0.1
-Release: 1.el7
+Release: 1
 Summary: Mydumper-based MySQL backups	
 BuildRoot: %{_tmppath}/%{name}-root
 Group: Applications/System

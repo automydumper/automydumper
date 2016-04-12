@@ -27,7 +27,7 @@ if [ -f '/etc/default/automydumper' ]; then
     source /etc/default/automydumper
 fi
 
-version="%buildNumber%"
+version="1.0.1"
 # What versions of Mydumper do we support?
 mydumper_versions='0.9'
 

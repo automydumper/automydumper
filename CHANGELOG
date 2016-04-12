@@ -1,1 +1,10 @@
-1.0 INITIAL VERSION
+--[ Automydumper 1.0.1 ] Release date: 12 april 2016
+
+* [FIX] Show the actual version of automydumper instead of %buildNumber%.
+* [NEW] We no longer hardcode the default for mysql_socket. 
+        Now it will autodetect it through my.cnf, as listed in the [client] section.
+* [NEW] Add rpm .spec file used to build the rpm.
+
+--[ Automydumper 1.0 ] Release date: 21 march 2016
+
+* [NEW] Initial release

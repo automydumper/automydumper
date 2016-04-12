@@ -75,9 +75,9 @@ Host of MySQL server.
 Default: localhost
 .TP
 .B mysql_socket
-Unix socket on which MySQL listens when host is localhost or 127.0.0.1.
+Unix socket on which MySQL listens when host is localhost or 127.0.0.1. Leaving this empty will autodetect it through my.cnf ( [client] section ).
 .br
-Default: /var/run/mysqld/mysqld.sock
+Default: empty
 .TP
 .B threads
 Amount of concurrent backup threads that take care of dumping InnoDB data from MySQL. The same amount of threads will be started for non-transactional tables as well.

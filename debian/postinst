@@ -2,8 +2,15 @@
 
 set -e
 
+adduser --system --home /var/backups/automydumper --group automydumper
+
 if [ -e /etc/default/automydumper ] ; then
-	. /etc/default/automydumper
+	grep -v ^# /etc/default/automydumper >> /etc/automydumper.cfg
+	rm -f /etc/default/automydumper
+fi
+
+if [ -e /etc/automydumper.cfg ] ; then
+	. /etc/automydumper.cfg
 fi
 
 if [ -z "${backupdir}" ] ; then
@@ -12,6 +19,10 @@ fi
 
 mkdir -p "${backupdir}"
 chmod 0600 "${backupdir}"
+chown automydumper:root "${backupdir}" -R
+
+chown automydumper:root /etc/automydumper.cfg
+chmod 0640 /etc/automydumper.cfg
 
 if [ -f /etc/cron.d/automydumper ]; then
     minute="$(cat /etc/cron.d/automydumper | gawk '/([0-9]+)\s+([0-9]+).*\/usr\/sbin\/automydumper/ { print $1 }')"
@@ -26,7 +37,7 @@ cat <<EOF > /etc/cron.d/automydumper
 # cron-job for automydumper
 #
 
-${minute} ${hour} * * * root /usr/sbin/automydumper &> /dev/null
+${minute} ${hour} * * * automydumper /usr/sbin/automydumper &> /dev/null
 EOF
 
 #DEBHELPER#

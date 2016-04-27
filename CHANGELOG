@@ -1,3 +1,9 @@
+--[ Automydumper 1.1 ] Release date: ??
+
+* [NEW] Config file now /etc/automydumper.cfg instead of /etc/default/automydumper
+* [NEW] Run as automydumper user instead of root by default.
+* [NEW] Work with hour:minute folders per backup, allowing for multiple backups in 1 day.
+
 --[ Automydumper 1.0.1 ] Release date: 12 april 2016
 
 * [FIX] Show the actual version of automydumper instead of %buildNumber%.

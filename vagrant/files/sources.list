@@ -2,4 +2,4 @@ deb http://httpredir.debian.org/debian jessie main
 
 deb http://security.debian.org/ jessie/updates main
 
-deb http://repo.percona.com/apt jessie stable
+deb http://repo.percona.com/apt jessie main 

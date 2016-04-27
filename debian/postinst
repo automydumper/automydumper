@@ -2,42 +2,55 @@
 
 set -e
 
-adduser --system --home /var/backups/automydumper --group automydumper
+case "$1" in
+    configure)
 
-if [ -e /etc/default/automydumper ] ; then
-	grep -v ^# /etc/default/automydumper >> /etc/automydumper.cfg
-	rm -f /etc/default/automydumper
-fi
+        adduser --system --home /var/backups/automydumper --group --shell /bin/sh --no-create-home automydumper
 
-if [ -e /etc/automydumper.cfg ] ; then
-	. /etc/automydumper.cfg
-fi
+        # Migration to /etc/automydumper.cfg for older versions
+        if [ -e /etc/default/automydumper ] ; then
+            grep -v ^# /etc/default/automydumper >> /etc/automydumper.cfg
+            rm -f /etc/default/automydumper
+        fi
 
-if [ -z "${backupdir}" ] ; then
-	backupdir=/var/backups/automydumper
-fi
+        if [ -e /etc/automydumper.cfg ] ; then
+            . /etc/automydumper.cfg
+        fi
 
-mkdir -p "${backupdir}"
-chmod 0600 "${backupdir}"
-chown automydumper:root "${backupdir}" -R
+        if [ -z "${backupdir}" ] ; then
+            backupdir=/var/backups/automydumper
+        fi
 
-chown automydumper:root /etc/automydumper.cfg
-chmod 0640 /etc/automydumper.cfg
+        mkdir -p "${backupdir}"
+        chmod 0750 "${backupdir}" /var/lib/automydumper /var/log/automydumper
+        chown automydumper:root "${backupdir}" /var/lib/automydumper /var/log/automydumper
 
-if [ -f /etc/cron.d/automydumper ]; then
-    minute="$(cat /etc/cron.d/automydumper | gawk '/([0-9]+)\s+([0-9]+).*\/usr\/sbin\/automydumper/ { print $1 }')"
-    hour="$(cat /etc/cron.d/automydumper | gawk '/([0-9]+)\s+([0-9]+).*\/usr\/sbin\/automydumper/ { print $2 }')"
-else
-    minute="$((RANDOM%59))"
-    hour="$((RANDOM%4))"
-fi
+        chown root:automydumper /etc/automydumper.cfg
+        chmod 0640 /etc/automydumper.cfg
 
-cat <<EOF > /etc/cron.d/automydumper
-#
-# cron-job for automydumper
-#
+        if [ -f /etc/cron.d/automydumper ]; then
+            minute="$(cat /etc/cron.d/automydumper | gawk '/([0-9]+)\s+([0-9]+).*\/usr\/sbin\/automydumper/ { print $1 }')"
+            hour="$(cat /etc/cron.d/automydumper | gawk '/([0-9]+)\s+([0-9]+).*\/usr\/sbin\/automydumper/ { print $2 }')"
+        else
+            minute="$((RANDOM%59))"
+            hour="$((RANDOM%4))"
+        fi
 
-${minute} ${hour} * * * automydumper /usr/sbin/automydumper &> /dev/null
+        cat <<EOF > /etc/cron.d/automydumper
+        #
+        # cron-job for automydumper
+        #
+
+        ${minute} ${hour} * * * automydumper /usr/sbin/automydumper &> /dev/null
 EOF
+    ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
 
 #DEBHELPER#

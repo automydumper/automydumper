@@ -7,5 +7,5 @@ Standards-Version: 3.9.5
 
 Package: automydumper
 Architecture: all
-Depends: ${misc:Depends}, mydumper (>= 0.9), gawk, heirloom-mailx
+Depends: ${misc:Depends}, mydumper (>= 0.9), gawk, heirloom-mailx, adduser
 Description: Daily backups for your MySQL server, backed by Mydumper

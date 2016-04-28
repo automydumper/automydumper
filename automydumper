@@ -4,7 +4,7 @@
 if [ $UID -eq 0 ]; then
   export PATH="$PATH:/bin:/usr/bin"
   echo -e "\nRefusing to run as root, switching to user automydumper."
-  exec su automydumper "$0"
+  exec su -s /bin/bash automydumper "$0"
 fi
 
 export PATH="$PATH:/bin:/usr/bin"

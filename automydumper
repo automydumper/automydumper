@@ -216,6 +216,7 @@ rm -rf "${backupdir}/${curdate}/${curtime}"
 mydumper ${mydumper_opts}
 if [ $? -ne 0 ]; then
     echo "Backup failed."
+    rm -rf "${backupdir}/${curdate}/${curtime}"
     exit 1
 fi
 

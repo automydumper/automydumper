@@ -5,7 +5,7 @@ set -e
 case "$1" in
     configure)
 
-        adduser --system --home /var/backups/automydumper --group --shell /bin/sh --no-create-home automydumper
+        adduser --system --home /var/backups/automydumper --group --shell /bin/bash --no-create-home automydumper
 
         # Migration to /etc/automydumper.cfg for older versions
         if [ -e /etc/default/automydumper ] ; then

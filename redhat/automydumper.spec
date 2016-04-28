@@ -34,6 +34,9 @@ install -m 644 debian/man/automydumper.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 %config /etc/default/automydumper
 %{_mandir}/man8/*
 
+%pre
+adduser --system --home /var/backups/automydumper --group --shell /bin/bash --no-create-home automydumper
+
 #%changelog
 #* Mon Mar 21 2016 Bart Verwilst <bart@verwilst.be>
 #- Initial release

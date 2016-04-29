@@ -1,8 +1,8 @@
-automydumper (1.1~alpha1) jessie; urgency=low
+automydumper (1.1~alpha2) jessie; urgency=low
 
   * See CHANGELOG
 
- -- Bart Verwilst <bart@verwilst.be>  Thu, 28 April 2016 14:36:32 +0000
+ -- Bart Verwilst <bart@verwilst.be>  Fri, 29 April 2016 09:59:32 +0000
 
 automydumper (1.0.1) jessie; urgency=low
 

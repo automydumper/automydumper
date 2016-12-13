@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 
-# Switch to automydumper user
-if [ $UID -eq 0 ]; then
-  export PATH="$PATH:/bin:/usr/bin"
-  echo -e "\nRefusing to run as root, switching to user automydumper."
-  exec su -s /bin/bash automydumper "$0"
-fi
 
 export PATH="$PATH:/bin:/usr/bin"
 
@@ -162,6 +156,23 @@ function run_post_commands()
     fi
 }
 
+function run_mydumper()
+{
+
+    # Switch to automydumper user
+    if [ $UID -eq 0 ]; then
+        id automydumper &> /dev/null
+        if [ $? -eq 0 ]; then 
+            echo -e "Running as root! Switching to 'automydumper' user."
+            sudo -u automydumper mydumper $@
+            return $?
+        fi
+    fi
+    mydumper $@
+    return $?
+
+}
+
 function mail_report()
 {
     if [ ! -z "${mail_rcpts}" ]; then
@@ -213,7 +224,7 @@ run_pre_commands
 # Remove old backup first
 rm -rf "${backupdir}/${curdate}/${curtime}"
 
-mydumper ${mydumper_opts}
+run_mydumper ${mydumper_opts}
 if [ $? -ne 0 ]; then
     echo "Backup failed."
     rm -rf "${backupdir}/${curdate}/${curtime}"

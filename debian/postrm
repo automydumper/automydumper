@@ -2,7 +2,7 @@
 
 set -e
 
-rm -f /etc/cron.d/automydumper /var/lib/automydumper /var/log/automydumper
+rm -rf /etc/cron.d/automydumper /var/lib/automydumper /var/log/automydumper
 
 echo "Not removing backup directory"
 

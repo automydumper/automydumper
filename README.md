@@ -2,7 +2,7 @@ Automydumper handles backups, retention and rotation for MySQL, Percona Server a
 
 ### Configuring Automydumper
 
-Configuration takes place in /etc/default/automydumper. 
+Configuration takes place in /etc/automydumper.cfg. 
 
 ### Running Automydumper
 
@@ -16,12 +16,12 @@ Please refer to the myloader man page for more details. Below are some of the mo
 
 ##### Restoring a full MySQL instance ( all databases, all tables ), overwriting existing tables:
 
-myloader -d /var/backups/automydumper/2015-12-31/ -o -v 3
+myloader -d /var/backups/automydumper/2015-12-31/16:00 -o -v 3
 
 ##### Restoring a single database (db1), overwriting existing tables:
 
-myloader -d /var/backups/automydumper/2015-12-31/ -o -v 3 -s db1
+myloader -d /var/backups/automydumper/2015-12-31/16:00 -o -v 3 -s db1
 
 ##### Restoring a single table 't1' from database db1:
 
-zcat /var/backups/automydumper/2015-12-31/db1.t1.sql.gz | mysql db1
+zcat /var/backups/automydumper/2015-12-31/16:00/db1.t1.sql.gz | mysql db1

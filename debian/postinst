@@ -37,11 +37,11 @@ case "$1" in
         fi
 
         cat <<EOF > /etc/cron.d/automydumper
-        #
-        # cron-job for automydumper
-        #
+#
+# cron-job for automydumper
+#
 
-        ${minute} ${hour} * * * automydumper /usr/sbin/automydumper &> /dev/null
+${minute} ${hour} * * * automydumper /usr/sbin/automydumper &> /dev/null
 EOF
     ;;
     abort-upgrade|abort-remove|abort-deconfigure)

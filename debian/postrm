@@ -4,6 +4,8 @@ set -e
 
 rm -rf /etc/cron.d/automydumper /var/lib/automydumper /var/log/automydumper
 
+deluser automydumper
+
 echo "Not removing backup directory"
 
 #DEBHELPER#

@@ -68,6 +68,14 @@ function create_directory()
     fi
 }
 
+function create_latest_symlink()
+{
+    if [ -L "${backupdir}/latest" ]; then
+	rm "${backupdir}/latest"
+    fi
+    ln -s "$1" "${backupdir}/latest"
+}
+
 function check_mydumper()
 {
     which mydumper > /dev/null
@@ -217,6 +225,7 @@ echo -e "\nAutomydumper ${version} using $(mydumper --version | grep -i "mydumpe
 mydumper_opts="${mydumper_opts} $(mysql_credentials)"
 
 create_directory "${backupdir}/${curdate}"
+create_latest_symlink "${backupdir}/${curdate}/${curtime}"
 
 # Run pre_command if it is defined
 run_pre_commands

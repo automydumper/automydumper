@@ -1,16 +1,15 @@
-#!/usr/bin/env bash
-
+#!/bin/bash
 
 export PATH="$PATH:/bin:/usr/bin"
 
 # Defaults
-backupdir='/var/backups/automydumper'
-logdir='/var/log/automydumper'
+backup_root_dir='/var/backups/automydumper'
+backup_dir_format='+%F'
+log_dir='/var/log/automydumper'
+pre_dir='/usr/lib/automydumper/pre.d'
+post_dir='/usr/lib/automydumper/post.d'
 compress=1
-retention_daily=3
-retention_weekly=0
-retention_monthly=0
-retention_weekly_day='sunday'
+keep=3
 mysql_user='root'
 mysql_password=''
 mysql_host='localhost'
@@ -18,8 +17,6 @@ mysql_socket=
 threads=4
 mydumper_opts=''
 enabled=1
-pre_command=''
-post_command=''
 mail_rcpts=''
 mail_from="automydumper@${HOSTNAME}"
 
@@ -28,15 +25,19 @@ if [ -f '/etc/automydumper.cfg' ]; then
     source /etc/automydumper.cfg
 fi
 
+backup_dir_format="${backup_dir_format/ /}"
+
+formatted_date="$(date ${backup_dir_format})"
+
+backup_dir="${backup_root_dir}/${formatted_date}"
+
 version="1.1-dev"
 # What versions of Mydumper do we support?
 mydumper_versions='0.9'
 
-curdate="$(date +%Y-%m-%d)"
-curtime="$(date +%H:%M)"
-logfile="${logdir}/${curdate}_${curtime}.log"
+log_file="${log_dir}/${formatted_date/\//_}.log"
 
-mydumper_opts="${mydumper_opts} --less-locking --triggers --events --routines -o ${backupdir}/${curdate}/${curtime} -v 3 --use-savepoints --threads ${threads}"
+mydumper_opts="${mydumper_opts} --less-locking --triggers --events --routines -o ${backup_dir} -v 3 --use-savepoints --threads ${threads}"
 
 # Compression support
 [ $compress -eq 1 ] && mydumper_opts="$mydumper_opts --compress"
@@ -57,14 +58,12 @@ function mysql_credentials()
     fi
 }
 
-function create_directory()
+function check_mysql()
 {
-    if [ ! -d "$1" ]; then
-        mkdir -p "$1"
-        if [ $? -ne 0 ]; then
-            echo "Directory $1 doesn't exist and couldn't be created automatically. Aborting."
-            exit 1
-        fi
+    which mysql > /dev/null
+    if [ $? -ne 0 ]; then
+        write_state "critical" "MySQL client not installed."
+        exit 1
     fi
 }
 
@@ -81,7 +80,7 @@ function check_mysql_connection()
 {
     mysql $(mysql_credentials) -e 'select VERSION()' > /dev/null
     if [ $? -ne 0 ]; then
-        write_state "critical" 'Wrong MySQL credentials.'
+        write_state "critical" 'Wrong MySQL credentials or hostname/socket.'
         exit 1
     fi
 }
@@ -96,38 +95,34 @@ function check_mydumper_version()
     exit 1
 }
 
+function check_backup_root_dir()
+{
+    if [ "$(basename ${backup_root_dir})" != "automydumper" ]; then
+        write_state "critical" "Backup_root_dir top directory should be 'automydumper'"
+        exit 1
+    fi
+}
+
+function create_directories()
+{
+    mkdir -p $(dirname "${backup_dir}") "${log_dir}" "${pre_dir}" "${post_dir}"
+}
+
 function cleanup_backups()
 {
-    ret_days=$(mktemp)
-    ret_days_sorted=$(mktemp)
-    if [ $retention_monthly -gt 0 ]; then
-        for i in $(seq $retention_monthly -1 0); do
-            date -d"-${i}month" +%Y-%m-01 >> ${ret_days}
-        done
-    fi
-    if [ $retention_weekly -gt 0 ]; then
-        for i in $(seq $retention_weekly -1 0); do
-            date -d"${retention_weekly_day}-${i}week" +%Y-%m-%d >> ${ret_days}
-        done
-    fi
-    for i in $(seq $retention_daily -1 0); do
-        date -d"-${i}day" +%Y-%m-%d >> ${ret_days}
-    done
-    cat ${ret_days} | sort | uniq > ${ret_days_sorted}
 
-    cd ${backupdir}
-    for day in $(ls | diff ${ret_days_sorted} - | grep -E '^>' | cut -d' ' -f2 | grep -E "^[0-9]+-[0-9]+-[0-9]+$"); do
-        echo "Deleting old backup ${day}"
-        rm -rf "${backupdir}/${day}"
-        rm -f "${logdir}/${day}.log"
+    while [ "$(find "${backup_root_dir}" -type f -name "metadata" | wc -l)" -gt "${keep}" ]; do
+        oldest=$(find "${backup_root_dir}" -type f -name "metadata" -printf '%Cs %h\n' | sort | head -n 1 | awk '{ print $2}')
+        echo "Deleting ${oldest}"
+        rm -rf "${oldest}"
     done
     echo ""
-    rm -f ${ret_days} ${ret_days_sorted}
+
 }
 
 function write_state()
 {
-    create_directory "/var/lib/automydumper"
+    mkdir -p "/var/lib/automydumper"
     cat > /var/lib/automydumper/state << EOF
 status="$1"
 description="$2"
@@ -140,44 +135,27 @@ EOF
 
 function run_pre_commands()
 {
-    if [ ! -z "${pre_command}" ]; then
-        echo "Executing pre command: '${pre_command}'"
-        ${pre_command} || ( write_state "critical" "Pre-backup command failed."; exit 1)
+    for cmd in $(find ${pre_dir} -type f -executable); do
+        echo "Executing pre command: '${cmd}'"
+        ${cmd} || ( write_state "critical" "Pre-backup command failed."; exit 1)
         echo ""
-    fi
+    done
 }
 
 function run_post_commands()
 {
-    if [ ! -z "${post_command}" ]; then
-        echo "Executing post command: '${post_command}'"
-        ${post_command} || ( write_state "critical" "Post-backup command failed."; exit 1)
+    for cmd in $(find ${post_dir} -type f -executable); do
+        echo "Executing post command: '${cmd}'"
+        ${cmd} || ( write_state "critical" "Post-backup command failed."; exit 1)
         echo ""
-    fi
-}
-
-function run_mydumper()
-{
-
-    # Switch to automydumper user
-    if [ $UID -eq 0 ]; then
-        id automydumper &> /dev/null
-        if [ $? -eq 0 ]; then 
-            echo -e "Running as root! Switching to 'automydumper' user."
-            sudo -u automydumper mydumper $@
-            return $?
-        fi
-    fi
-    mydumper $@
-    return $?
-
+    done
 }
 
 function mail_report()
 {
     if [ ! -z "${mail_rcpts}" ]; then
         echo "Sending mail report to '${mail_rcpts}' from '${mail_from}'"
-        mailx -s "Backup for $(hostname) ${1}" -r "${mail_from}" "${mail_rcpts}" < "${logfile}"
+        mailx -s "Backup for $(hostname) ${1}" -r "${mail_from}" "${mail_rcpts}" < "${log_file}"
     else
         echo -e "Not configured to send a mail report.\n"
     fi
@@ -186,13 +164,20 @@ function mail_report()
 
 function verify_backups()
 {
-    if grep WARNING "${logfile}" > /dev/null; then
+    if grep WARNING "${log_file}" > /dev/null; then
         write_state "warning" "Backup completed with warnings."
         mail_report 'Warning'
     else
         write_state "ok" "Backup completed successfully."
+        echo -e "Saved to ${backup_dir}.\n"
         mail_report 'OK'
     fi
+}
+
+function symlink_latest()
+{
+    rm -f "${backup_root_dir}/latest"
+    ln -sf "${backup_dir}" "${backup_root_dir}/latest"
 }
 
 # Stop the script when it's disabled by the user.
@@ -203,33 +188,36 @@ fi
 
 trap "{ write_state critical 'Backup failed.' ; mail_report 'failed'; exit 255; }" ERR
 
-create_directory "$logdir"
+mkdir -p "${log_dir}"
 
-exec > >(tee -i "${logfile}")
+exec > >(tee -i "${log_file}")
 exec 2>&1
 
+check_backup_root_dir
+check_mysql
 check_mydumper
 check_mydumper_version
 check_mysql_connection
+create_directories
 
 echo -e "\nAutomydumper ${version} using $(mydumper --version | grep -i "mydumper")\n"
 
 mydumper_opts="${mydumper_opts} $(mysql_credentials)"
 
-create_directory "${backupdir}/${curdate}"
-
 # Run pre_command if it is defined
 run_pre_commands
 
 # Remove old backup first
-rm -rf "${backupdir}/${curdate}/${curtime}"
+rm -rf "${backup_dir}"
 
-run_mydumper ${mydumper_opts}
+mydumper ${mydumper_opts}
 if [ $? -ne 0 ]; then
     echo "Backup failed."
-    rm -rf "${backupdir}/${curdate}/${curtime}"
+    rm -rf "${backup_dir}"
     exit 1
 fi
+
+symlink_latest
 
 # Run post_command if it is defined
 run_post_commands

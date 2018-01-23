@@ -5,11 +5,6 @@ set -e
 case "$1" in
     configure)
 
-	id automydumper &> /dev/null
-	if [ $? -ne 0 ]; then
-            adduser --system --home /var/backups/automydumper --group --shell /bin/bash --no-create-home automydumper
-        fi
-
         # Migration to /etc/automydumper.cfg for older versions
         if [ -e /etc/default/automydumper ] ; then
             grep -v ^# /etc/default/automydumper >> /etc/automydumper.cfg
@@ -20,20 +15,9 @@ case "$1" in
             . /etc/automydumper.cfg
         fi
 
-        if [ -z "${backupdir}" ] ; then
-            backupdir=/var/backups/automydumper
-        fi
-
-        mkdir -p "${backupdir}"
-        chmod 0750 "${backupdir}" /var/lib/automydumper /var/log/automydumper
-        chown automydumper:root "${backupdir}" /var/lib/automydumper /var/log/automydumper
-
-        chown root:automydumper /etc/automydumper.cfg
-        chmod 0640 /etc/automydumper.cfg
-
         if [ -f /etc/cron.d/automydumper ]; then
-            minute="$(cat /etc/cron.d/automydumper | gawk '/(\s+).*\/usr\/sbin\/automydumper/ { print $1 }')"
-            hour="$(cat /etc/cron.d/automydumper | gawk '/(\s+).*\/usr\/sbin\/automydumper/ { print $2 }')"
+            minute="$(cat /etc/cron.d/automydumper | gawk '/(\s+).*\/usr\/bin\/automydumper/ { print $1 }')"
+            hour="$(cat /etc/cron.d/automydumper | gawk '/(\s+).*\/usr\/bin\/automydumper/ { print $2 }')"
         else
             minute="$((RANDOM%59))"
             hour="$((RANDOM%4))"
@@ -44,7 +28,7 @@ case "$1" in
 # cron-job for automydumper
 #
 
-${minute} ${hour} * * * automydumper /usr/sbin/automydumper &> /dev/null
+${minute} ${hour} * * * root /usr/bin/automydumper &> /dev/null
 EOF
     ;;
     abort-upgrade|abort-remove|abort-deconfigure)

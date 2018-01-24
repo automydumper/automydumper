@@ -12,10 +12,10 @@ To restore, myloader ( part of the Mydumper package ) should be used. See its ma
 The automydumper command does not take any options. It it configured by editing /etc/default/automydumper.
 .SH FILES
 .TP
-/etc/default/automydumper
+/etc/automydumper.cfg
 Main configuration file. Uses key=value notation. See VARIABLES chapter in the manpage.
 .TP
-/usr/sbin/automydumper
+/usr/bin/automydumper
 Wrapper around Mydumper. Main application that handles the actual backing-up and clean of old backups.
 .TP
 /etc/cron.d/automydumper
@@ -39,25 +39,10 @@ Toggle gzip compression of output files. Compression is done on the fly.
 .br
 Default: 1
 .TP
-.B retention_daily
-Determines how many daily backups will be kept.
+.B keep
+Determines how many backups will be kept.
 .br
 Default: 3
-.TP
-.B retention_weekly
-Determines how many weekly backups will be kept.
-.br
-Default: 0
-.TP
-.B retention_weekly_day
-What day is marked as being a 'weekly' backup.
-.br
-Default: sunday
-.TP
-.B retention_monthly
-Determines how many monthly backups will be kept ( 1st day of the month ).
-.br
-Default: 0
 .TP
 .B mysql_user
 User for MySQL connection.

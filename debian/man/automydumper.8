@@ -1,5 +1,5 @@
 .\" Manpage for automydumper.
-.TH man 8 "19 Mar 2016" "1.0" "automydumper man page"
+.TH man 8 "24 Jan 2018" "1.1.0" "automydumper man page"
 .SH NAME
 automydumper \- Automated MySQL backups using Mydumper
 .SH SYNOPSIS
@@ -23,10 +23,15 @@ Scheduled backup runs by Cron.
 .SH VARIABLES
 The following variables can be used in /etc/default/automydumper to customize the automydumper application.
 .TP
-.B backupdir
+.B backup_root_dir
 Top directory where backups will be stored.
 .br
 Default: /var/backups/automydumper
+.TP
+.B backup_root_format
+Backups will be stored in directies named by the following format. Use `date --help` to see all possible options. When using '/' inside the format, new directories will be created.
+.br
+Default: +%F
 .TP
 .B logdir
 .br
@@ -79,13 +84,13 @@ When this is 0, the script will exit immediately and perform no backups or check
 .br
 Default: 1
 .TP
-.B pre_command
-Command that will be executed BEFORE the actual backup. If the command fails, the backup will abort.
+.B pre_dir
+Directory with optional scripts that will be executed BEFORE the actual backup. If a script fails, the backup will abort. Scripts need to be executable!
 .br
 Default: empty
 .TP
-.B post_command
-Command that will be executed AFTER the actual backup. If the command fails, the backup will abort.
+.B post_dir
+Directory with optional scripts that will be executed AFTER the actual backup. If the command fails, the backup will abort. Scripts need to be executable!
 .br
 Default: empty
 .TP

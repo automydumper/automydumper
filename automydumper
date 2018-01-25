@@ -31,7 +31,7 @@ formatted_date="$(date ${backup_dir_format})"
 
 backup_dir="${backup_root_dir}/${formatted_date}"
 
-version="1.1-dev"
+version="1.1.0"
 # What versions of Mydumper do we support?
 mydumper_versions='0.9'
 

@@ -1,2 +1,3 @@
 automydumper /usr/bin
 automydumper.cfg /etc
+examples /usr/share/doc/automydumper

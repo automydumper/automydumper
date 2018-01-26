@@ -42,6 +42,29 @@ mydumper_opts="${mydumper_opts} --less-locking --triggers --events --routines -o
 # Compression support
 [ $compress -eq 1 ] && mydumper_opts="$mydumper_opts --compress"
 
+
+options=$(getopt -o h --long help -- "$@")
+[ $? -eq 0 ] || {
+    echo "Incorrect options provided"
+    exit 1
+}
+eval set -- "$options"
+while true; do
+    case "$1" in
+    --help|-h)
+        echo ""
+        echo "Automydumper ${version}"
+        echo ""
+        exit
+        ;;
+    --)
+        shift
+        break
+        ;;
+    esac
+    shift
+done
+
 function mysql_credentials()
 {
     echo -n "--user=${mysql_user} "
@@ -110,6 +133,11 @@ function create_directories()
 
 function cleanup_backups()
 {
+
+    if [ ${keep} -eq 0 ]; then
+        echo -e "Cleanup of old backups disabled because of keep=0\n"
+        return
+    fi
 
     while [ "$(find "${backup_root_dir}" -type f -name "metadata" | wc -l)" -gt "${keep}" ]; do
         oldest=$(find "${backup_root_dir}" -type f -name "metadata" -printf '%Cs %h\n' | sort | head -n 1 | awk '{ print $2}')

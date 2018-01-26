@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+#
+# Handles retention on a daily, weekly and/or monthly basis. Make sure you set keep=0 in automydumper.cfg!!
+# Only works when backups are stored in a backup_dir_format starting with '+%F' or '+%Y-%m-%d' as toplevel dir.
+# e.g. '+%F', '+%F/%R:%S', ...
+# If not, all backups will be erased. You have been warned.
+# Use at your own risk.
+#
+
+#### CONFIG ####
+
+retention_daily=3
+retention_weekly=0
+retention_monthly=0
+retention_weekly_day='sunday'
+
+#### END CONFIG ####
+
+backup_root_dir='/var/backups/automydumper'
+source /etc/automydumper.cfg
+
+ret_days=$(mktemp)
+ret_days_sorted=$(mktemp)
+if [ $retention_monthly -gt 0 ]; then
+    for i in $(seq $retention_monthly -1 0); do
+        date -d"-${i}month" +%Y-%m-01 >> ${ret_days}
+    done
+fi
+if [ $retention_weekly -gt 0 ]; then
+    for i in $(seq $retention_weekly -1 0); do
+        date -d"${retention_weekly_day}-${i}week" +%Y-%m-%d >> ${ret_days}
+    done
+fi
+for i in $(seq $retention_daily -1 0); do
+    date -d"-${i}day" +%Y-%m-%d >> ${ret_days}
+done
+cat ${ret_days} | sort | uniq > ${ret_days_sorted}
+
+cd ${backup_root_dir}
+for day in $(ls | diff ${ret_days_sorted} - | grep -E '^>' | cut -d' ' -f2 | grep -E "^[0-9]+-[0-9]+-[0-9]+$"); do
+    echo "Deleting old backup ${day}"
+    rm -rf "${backup_root_dir}/${day}"
+    rm -f "${logdir}/${day}.log"
+done
+rm -f ${ret_days} ${ret_days_sorted}

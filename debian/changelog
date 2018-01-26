@@ -1,8 +1,14 @@
+automydumper (1.2.0) stretch; urgency=low
+
+  * See CHANGELOG
+
+ -- Bart Verwilst <bart@verwilst.be>  Fri, 26 Jan 2018 23:45:32 +0000
+
 automydumper (1.1.0) stretch; urgency=low
 
   * See CHANGELOG
 
- -- Bart Verwilst <bart@verwilst.be>  Tue, 23 Apr 2018 23:45:32 +0000
+ -- Bart Verwilst <bart@verwilst.be>  Wed, 24 Jan 2018 23:45:32 +0000
 
 automydumper (1.0.1) jessie; urgency=low
 

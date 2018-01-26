@@ -1,8 +1,13 @@
---[ Automydumper 1.1 ] Release date: ??
+--[ Automydumper 1.2.0 ] Release date: 26 january 2018
+
+* [NEW] Set keep=0 to disable cleaning of old backups.
+* [NEW] Add --help/-h to script to show help instead of starting a new backup.
+
+--[ Automydumper 1.1.0 ] Release date: 24 january 2018
 
 * [NEW] Config file now /etc/automydumper.cfg instead of /etc/default/automydumper
-* [NEW] Run as automydumper user instead of root by default.
-* [NEW] Work with hour:minute folders per backup, allowing for multiple backups in 1 day.
+* [NEW] Flexible backup directory layout with macros.
+* [NEW] Removed monthly/weekly/daily backups, introduced 'keep' variable instead.
 * [FIX] Remove /var/lib/automydumper correctly on uninstall.
 
 --[ Automydumper 1.0.1 ] Release date: 12 april 2016

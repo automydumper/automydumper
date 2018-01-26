@@ -4,6 +4,7 @@
 * [NEW] Add --help/-h to script to show help instead of starting a new backup.
 * [NEW] Add post.d example script
 * [FIX] Add all needed directories to rpm spec file
+* [FIX] RPM should be noarch, not x86_64
 
 --[ Automydumper 1.1.0 ] Release date: 24 january 2018
 

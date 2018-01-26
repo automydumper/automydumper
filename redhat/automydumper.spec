@@ -4,7 +4,8 @@ Release: 1
 Summary: Mydumper-based MySQL backups
 BuildRoot: %{_tmppath}/%{name}-root
 Group: Applications/System
-License: GPL	
+License: GPL
+BuildArch: noarch
 URL: http://automydumper.org
 Packager: Bart Verwilst <bart@verwilst.be>
 Source0: automydumper-%{version}.tar.gz

@@ -5,7 +5,6 @@ export PATH="$PATH:/bin:/usr/bin"
 # Defaults
 backup_root_dir='/var/backups/automydumper'
 backup_dir_format='+%F'
-log_dir='/var/log/automydumper'
 pre_dir='/usr/share/automydumper/pre.d'
 post_dir='/usr/share/automydumper/post.d'
 compress=1
@@ -21,29 +20,32 @@ mail_rcpts=''
 mail_from="automydumper@${HOSTNAME}"
 
 version="1.3.0"
-echo -e "\nNote: Automydumper version ${version}"
 
 for cfg in "${HOME}/.automydumper.cfg" /etc/automydumper.cfg; do
     # Override defaults if config file is present
     if [ -f "${cfg}" ]; then
         source "${cfg}"
-        echo "Note: Using ${cfg} to override defaults."
         export AUTOMYDUMPER_CFG_FILE="${cfg}"
         break
     fi
 done
+
+# Overwrite backup when a backup with the same name exists.
+overwrite_backup=0
 
 backup_dir_format="${backup_dir_format/ /}"
 
 formatted_date="$(date ${backup_dir_format})"
 
 backup_dir="${backup_root_dir}/${formatted_date}"
-export AUTOMYDUMPER_BACKUP_DIR=${backup_dir}
+export AUTOMYDUMPER_BACKUP_ROOT="${backup_root_dir}"
+export AUTOMYDUMPER_BACKUP_DIR="${backup_dir}"
 
 # Set preliminary successful exitcode
 export AUTOMYDUMPER_EXIT_CODE=0
+export AUTOMYDUMPER_EXIT_MESSAGE=
 
-log_file="${log_dir}/${formatted_date/\//_}.log"
+log_file="${backup_dir}/automydumper.log"
 
 mydumper_opts="${mydumper_opts} --less-locking --triggers --events --routines -o ${backup_dir} -v 3 --use-savepoints --threads ${threads}"
 
@@ -51,7 +53,7 @@ mydumper_opts="${mydumper_opts} --less-locking --triggers --events --routines -o
 [ $compress -eq 1 ] && mydumper_opts="$mydumper_opts --compress"
 
 
-options=$(getopt -o h --long help -- "$@")
+options=$(getopt -o h -o f --long help --long force -- "$@")
 [ $? -eq 0 ] || {
     echo "Incorrect options provided"
     exit 1
@@ -64,6 +66,9 @@ while true; do
         echo "Automydumper ${version}"
         echo ""
         exit
+        ;;
+    --force|-f)
+        overwrite_backup=1
         ;;
     --)
         shift
@@ -88,44 +93,25 @@ function mysql_credentials()
     fi
 }
 
-function check_mysql()
+function check_binaries()
 {
-    which mysql > /dev/null
-    if [ $? -ne 0 ]; then
-        handle_error "MySQL client not installed."
-    fi
+    for binary in "$@"; do
+        if ! which "${binary}" > /dev/null; then
+            handle_error "${binary} not installed"
+        fi
+    done
 }
 
-function check_mydumper()
+function show_mydumper_version()
 {
-    which mydumper > /dev/null
-    if [ $? -ne 0 ]; then
-        handle_error "Mydumper not installed."
-    else
-        echo "Note: Using $(mydumper --version | grep -i mydumper)"
-    fi
+    echo "Note: Using $(mydumper --version | grep -i mydumper)"
 }
 
 function check_mysql_connection()
 {
-    mysql $(mysql_credentials) -e 'select VERSION()' > /dev/null
-    if [ $? -ne 0 ]; then
-        handle_error 'Wrong MySQL credentials or hostname/socket.'
+    if ! mysql $(mysql_credentials) -e 'select VERSION()' > /dev/null; then
+        handle_error 'Wrong MySQL credentials or hostname/socket'
     fi
-}
-
-function check_backup_root_dir()
-{
-    if [ "$(basename ${backup_root_dir})" != "automydumper" ]; then
-        handle_error "Backup_root_dir top directory should be 'automydumper'"
-    fi
-}
-
-function create_directories()
-{
-    [ ${AUTOMYDUMPER_EXIT_CODE} -gt 0 ] && return
-
-    mkdir -p $(dirname "${backup_dir}") "${log_dir}" "${pre_dir}" "${post_dir}"
 }
 
 function cleanup_backups()
@@ -155,43 +141,57 @@ function handle_error()
 
 function run_commands()
 {
+    command_dir=${1}
+
+    # Only run if command dir exists
+    if [ ! -d ${command_dir} ]; then
+        echo "Note: ${command_dir} does not exist, not searching for scripts to execute."
+        return
+    fi
+
     for cmd in $(find ${1} -maxdepth 1 -type f -executable); do
         if [ "${AUTOMYDUMPER_EXIT_CODE}" -eq 0 ]; then
-            echo "CMD: '${cmd}'"
-            ${cmd} || handle_error "Command ${cmd} failed."
+
+            # Only run when the exit code is > 0 when tag below is found
+            grep automydumper:run:on-error ${cmd} &> /dev/null && return
+
+            echo "Note: Executing ${cmd}"
+            echo "--- begin output ---"
+            ${cmd} || handle_error "Command ${cmd} failed"
+            echo "--- end output ---"
         else
-            grep "automydumper:always" ${cmd} &> /dev/null
-            if [ $? -eq 0 ]; then
-                echo "CMD: '${cmd}'"
-                ${cmd} || handle_error "Command ${cmd} failed."
+            if grep -E "automydumper:run:(on-error-only|always)" ${cmd} &> /dev/null; then
+                echo "Note: Executing ${cmd}"
+                echo "--- begin output ---"
+                ${cmd} || handle_error "Command ${cmd} failed"
+                echo "--- end output ---"
             fi
         fi
     done
 }
 
-function verify_backups()
+function overwrite_previous_backup()
 {
-    return
-#    if grep WARNING "${log_file}" > /dev/null; then
-#        write_state "warning" "Backup completed with warnings."
-#        mail_report 'Warning'
-#    else
-#        write_state "ok" "Backup completed successfully."
-#        echo -e "Saved to ${backup_dir}.\n"
-#        mail_report 'OK'
-#    fi
-}
-
-function check_overwriting()
-{
-
+  # &&
     [ ${AUTOMYDUMPER_EXIT_CODE} -gt 0 ] && return
 
-    if [ -f "${backup_dir}/metadata" ]; then
-        handle_error "Backup already exists."
+    if [ ${overwrite_backup} -eq 0 ]; then
+        if [ -f "${backup_dir}/metadata" ]; then
+            handle_error "Backup already exists"
+            return
+        elif [ -f "${backup_dir}/metadata.partial" ]; then
+            echo "Note: Deleting previous partial backup."
+        fi
+    else
+      echo "Note: if a backup with the same name exists it will be forcefully removed"
     fi
 
-}
+    find "${backup_dir}" -mindepth 1 \( ! -iname "automydumper.log" \) -delete
+
+    # Remove broken latest symlink if backup it's pointing to is no longer there.
+    [ ! -e "${backup_root_dir}/latest" ] && rm -f "${backup_root_dir}/latest"
+
+  }
 
 function symlink_latest()
 {
@@ -205,50 +205,64 @@ function run_mydumper()
 
     mydumper_opts="${mydumper_opts} $(mysql_credentials)"
     mydumper ${mydumper_opts}
+
+    if [ $? -eq 0 ]; then
+        symlink_latest
+    else
+        handle_error "Mydumper could not complete backup"
+    fi
+
 }
 
-function show_errors()
+function show_header()
+{
+    echo -e "\nAutomydumper version ${version}\n"
+    echo "Started at `date`"
+    echo ""
+    [ -z ${AUTOMYDUMPER_CFG_FILE} ] || echo "Note: Using ${AUTOMYDUMPER_CFG_FILE} to override defaults."
+}
+
+function show_footer()
 {
     if [ ${AUTOMYDUMPER_EXIT_CODE} -gt 0 ]; then
+        echo ""
         echo "Critical: ${AUTOMYDUMPER_EXIT_MESSAGE}. Quitting."
+    else
+        echo "Finished at `date`"
     fi
 }
 
 # Stop the script when it's disabled by the user.
 if [ $enabled -eq 0 ]; then
-    echo "Script is disabled. Enable by removing enabled=0 from /etc/default/automydumper. Quitting."
+    echo "Automydumper is disabled. Enable by removing enabled=0. Quitting."
     exit 0
 fi
 
-#trap "{ handle_error 'Unhandled exception.' }" ERR
+# Make sure backup directory exists
+mkdir -p "${backup_dir}"
 
-mkdir -p "${log_dir}"
+# Remove the log before we restart the logging when we're overwriting the backup.
+[ ${overwrite_backup} -eq 1 ] && rm -f "${backup_dir}/automydumper.log"
 
-exec > >(tee -i "${log_file}")
+exec > >(tee -ia "${backup_dir}/automydumper.log")
 exec 2>&1
 
-check_backup_root_dir
-check_mysql
-check_mydumper
+show_header
+
+check_binaries mysql mydumper
+show_mydumper_version
 check_mysql_connection
-create_directories
 
-# Run pre_command if it is defined
+overwrite_previous_backup
+
 run_commands ${pre_dir}
-
-check_overwriting
 
 run_mydumper
 
-symlink_latest
-
-# Run post_command if it is defined
 run_commands ${post_dir}
 
 cleanup_backups
 
-verify_backups
-
-show_errors
+show_footer
 
 exit ${AUTOMYDUMPER_EXIT_CODE}

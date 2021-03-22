@@ -196,7 +196,7 @@ function check_overwriting()
 function symlink_latest()
 {
     rm -f "${backup_root_dir}/latest"
-    ln -sf "${backup_dir}" "${backup_root_dir}/latest"
+    ln -sfr "${backup_dir}" "${backup_root_dir}/latest"
 }
 
 function run_mydumper()

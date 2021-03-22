@@ -45,8 +45,6 @@ export AUTOMYDUMPER_BACKUP_DIR="${backup_dir}"
 export AUTOMYDUMPER_EXIT_CODE=0
 export AUTOMYDUMPER_EXIT_MESSAGE=
 
-log_file="${backup_dir}/automydumper.log"
-
 mydumper_opts="${mydumper_opts} --less-locking --triggers --events --routines -o ${backup_dir} -v 3 --use-savepoints --threads ${threads}"
 
 # Compression support
@@ -204,9 +202,7 @@ function run_mydumper()
     [ ${AUTOMYDUMPER_EXIT_CODE} -gt 0 ] && return
 
     mydumper_opts="${mydumper_opts} $(mysql_credentials)"
-    mydumper ${mydumper_opts}
-
-    if [ $? -eq 0 ]; then
+    if mydumper ${mydumper_opts}; then
         symlink_latest
     else
         handle_error "Mydumper could not complete backup"

@@ -17,7 +17,7 @@ retention_weekly_day='sunday'
 
 #### END CONFIG ####
 
-backup_root_dir='/var/backups/automydumper'
+backup_root_dir=${AUTOMYDUMPER_BACKUP_ROOT}
 source /etc/automydumper.cfg
 
 ret_days=$(mktemp)

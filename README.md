@@ -2,7 +2,7 @@ Automydumper handles backups, retention and rotation for MySQL, Percona Server a
 
 ### Configuring Automydumper
 
-Configuration takes place in /etc/automydumper.cfg. 
+Overriding defaults should be done in ~/.automydumper.cfg or /etc/automydumper.cfg, in that order. 
 
 ### Running Automydumper
 

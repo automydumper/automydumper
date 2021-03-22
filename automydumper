@@ -228,11 +228,23 @@ function show_footer()
     fi
 }
 
+function validate_date_format()
+{
+    # Make sure only valid chars are there
+    if ! echo ${formatted_date} | grep -Eq '^[a-zA-Z0-9_-]+$' &> /dev/null; then
+        show_header
+        echo "Critical: date as set in backup_dir_format parameter can only contain numbers, letters, dashes or underscores."
+        exit 1
+    fi
+}
+
 # Stop the script when it's disabled by the user.
 if [ $enabled -eq 0 ]; then
     echo "Automydumper is disabled. Enable by removing enabled=0. Quitting."
     exit 0
 fi
+
+validate_date_format
 
 # Make sure backup directory exists
 mkdir -p "${backup_dir}"

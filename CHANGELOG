@@ -1,5 +1,15 @@
 --[ Automydumper 1.2.0 ] Release date: 26 january 2018
 
+* [NEW] Add --force/-f to script to overwrite a previous backup with the same name.
+* [NEW] Labels for pre and post scripts to steer their execution.
+* [NEW] Do not overwrite an older backup by default, but still remove partial ones.
+* [NEW] Limit possible directory names for the backup directory. This greatly simplifies the code around it.
+* [NEW] 'latest' symlink is now relative, thanks mbk87!
+* [DEPRECATE] Remove mail-related variables since we didn't do anything with them anyways. Use pre or post scripts to send mails.
+* [DEPRECATE] log_dir variable removed. Logs are stored inside the backup directory now as automydumper.log
+
+--[ Automydumper 1.2.0 ] Release date: 26 january 2018
+
 * [NEW] Set keep=0 to disable cleaning of old backups.
 * [NEW] Add --help/-h to script to show help instead of starting a new backup.
 * [NEW] Add post.d example script

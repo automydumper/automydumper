@@ -151,7 +151,7 @@ function run_commands()
         if [ "${AUTOMYDUMPER_EXIT_CODE}" -eq 0 ]; then
 
             # Only run when the exit code is > 0 when tag below is found
-            grep automydumper:run:on-error ${cmd} &> /dev/null && return
+            grep automydumper:run:on-error-only ${cmd} &> /dev/null && return
 
             echo "Note: Executing ${cmd}"
             echo "--- begin output ---"

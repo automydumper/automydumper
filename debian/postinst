@@ -15,21 +15,7 @@ case "$1" in
             . /etc/automydumper.cfg
         fi
 
-        if [ -f /etc/cron.d/automydumper ]; then
-            minute="$(cat /etc/cron.d/automydumper | gawk '/(\s+).*\/usr\/bin\/automydumper/ { print $1 }')"
-            hour="$(cat /etc/cron.d/automydumper | gawk '/(\s+).*\/usr\/bin\/automydumper/ { print $2 }')"
-        else
-            minute="$((RANDOM%59))"
-            hour="$((RANDOM%4))"
         fi
-
-        cat <<EOF > /etc/cron.d/automydumper
-#
-# cron-job for automydumper
-#
-
-${minute} ${hour} * * * root /usr/bin/automydumper &> /dev/null
-EOF
     ;;
     abort-upgrade|abort-remove|abort-deconfigure)
     ;;

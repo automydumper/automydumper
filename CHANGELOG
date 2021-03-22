@@ -1,4 +1,4 @@
---[ Automydumper 1.2.0 ] Release date: 26 january 2018
+--[ Automydumper 1.3.0 ] Release date: 22 march 2021
 
 * [NEW] Add --force/-f to script to overwrite a previous backup with the same name.
 * [NEW] Labels for pre and post scripts to steer their execution.
@@ -8,6 +8,7 @@
 * [NEW] add variables to remove --use-savepoints, --triggers, --events and --routines from mydumper
 * [DEPRECATE] Remove mail-related variables since we didn't do anything with them anyways. Use pre or post scripts to send mails.
 * [DEPRECATE] log_dir variable removed. Logs are stored inside the backup directory now as automydumper.log
+* [DEPRECATE] Remove cron handling from debian packge. DIY now!
 
 --[ Automydumper 1.2.0 ] Release date: 26 january 2018
 

@@ -137,8 +137,8 @@ function cleanup_backups()
 
 function handle_error()
 {
-  export AUTOMYDUMPER_EXIT_CODE=1
-  export AUTOMYDUMPER_EXIT_MESSAGE="${1}"
+    export AUTOMYDUMPER_EXIT_CODE=1
+    export AUTOMYDUMPER_EXIT_MESSAGE="${1}"
 }
 
 function run_commands()
@@ -178,6 +178,7 @@ function overwrite_previous_backup()
 
     if [ ${overwrite_backup} -eq 0 ]; then
         if [ -f "${backup_dir}/metadata" ]; then
+            echo "Error: Backup already exists"
             handle_error "Backup already exists"
             return
         elif [ -f "${backup_dir}/metadata.partial" ]; then

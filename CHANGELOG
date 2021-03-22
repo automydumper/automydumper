@@ -5,7 +5,9 @@
 * [NEW] Do not overwrite an older backup by default, but still remove partial ones.
 * [NEW] Limit possible directory names for the backup directory. This greatly simplifies the code around it.
 * [NEW] 'latest' symlink is now relative, thanks mbk87!
-* [NEW] add variables to remove --use-savepoints, --triggers, --events and --routines from mydumper
+* [NEW] Add variables to remove --use-savepoints, --triggers, --events and --routines from mydumper
+* [NEW] Add zabbix post.d script example
+* [NEW] Add debug post.d script example, which only runs when the automydumper fails.
 * [DEPRECATE] Remove mail-related variables since we didn't do anything with them anyways. Use pre or post scripts to send mails.
 * [DEPRECATE] log_dir variable removed. Logs are stored inside the backup directory now as automydumper.log
 * [DEPRECATE] Remove cron handling from debian packge. DIY now!

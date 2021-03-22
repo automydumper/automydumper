@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# automydumper:run:on-error-only
+
+mkdir -p "${AUTOMYDUMPER_BACKUP_DIR}/debug"
+mysql -e "SHOW PROCESSLIST" > "${AUTOMYDUMPER_BACKUP_DIR}/debug/mysql-show-processlist.txt"
+pt-kill --busy-time 60 --run-time=1m --victims all --print > "${AUTOMYDUMPER_BACKUP_DIR}/debug/pt-kill.txt"

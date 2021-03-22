@@ -26,8 +26,6 @@ mkdir -p ${RPM_BUILD_ROOT}/etc
 mkdir -p ${RPM_BUILD_ROOT}%{_mandir}/man8
 mkdir -p ${RPM_BUILD_ROOT}/usr/share/doc/automydumper/examples
 mkdir -p ${RPM_BUILD_ROOT}/usr/share/doc/automydumper/examples/post.d
-mkdir -p ${RPM_BUILD_ROOT}/var/lib/automydumper
-mkdir -p ${RPM_BUILD_ROOT}/var/log/automydumper
 mkdir -p ${RPM_BUILD_ROOT}/var/backups/automydumper
 mkdir -p ${RPM_BUILD_ROOT}/usr/share/automydumper/pre.d
 mkdir -p ${RPM_BUILD_ROOT}/usr/share/automydumper/post.d
@@ -42,8 +40,6 @@ install -m 755 examples/post.d/* ${RPM_BUILD_ROOT}/usr/share/doc/automydumper/ex
 %config(noreplace) /etc/automydumper.cfg
 %{_mandir}/man8/*
 %{_docdir}/automydumper/*
-/var/lib/automydumper
-/var/log/automydumper
 /var/backups/automydumper
 /usr/share/automydumper/pre.d
 /usr/share/automydumper/post.d

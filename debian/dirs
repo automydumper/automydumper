@@ -1,5 +1,3 @@
-/var/lib/automydumper
-/var/log/automydumper
 /var/backups/automydumper
 /usr/share/automydumper/pre.d
 /usr/share/automydumper/post.d

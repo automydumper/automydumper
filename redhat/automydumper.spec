@@ -1,19 +1,19 @@
 Name: automydumper	
-Version: 1.2.0
+Version: 1.3.0
 Release: 1
 Summary: Mydumper-based MySQL backups
 BuildRoot: %{_tmppath}/%{name}-root
 Group: Applications/System
 License: GPL
 BuildArch: noarch
-URL: http://automydumper.org
+URL: https://github.com/automydumper/automydumper
 Packager: Bart Verwilst <bart@verwilst.be>
 Source0: automydumper-%{version}.tar.gz
 
-Requires: bash, mydumper >= 0.9	
+Requires: bash, mydumper
 
 %description
-MySQL/Mariadb backup tool based on Mydumper.
+MySQL/Percona/Mariadb backup tool based on Mydumper.
 
 %prep
 %setup -q
@@ -49,6 +49,9 @@ install -m 755 examples/post.d/* ${RPM_BUILD_ROOT}/usr/share/doc/automydumper/ex
 /usr/share/automydumper/post.d
 
 %changelog
+* Mon Mar 22 2021 Bart Verwilst <bart@verwilst.be>
+- New URL
+- Increment version
 * Mon Mar 21 2016 Bart Verwilst <bart@verwilst.be>
 - Initial release
 

@@ -11,7 +11,7 @@ services:
     volumes:
       - .:/app
   debian:
-    image: debian:stretch
+    image: debian:buster
     command: sleep infinity
     working_dir: /app
     volumes:

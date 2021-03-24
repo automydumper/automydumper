@@ -2,6 +2,7 @@
 
 * [NEW] Quit gracefully and do nothing when a backup is already present. Before we error'ed out, which wasn't a good solution.
 * [NEW] Allow ':' in backup_dir_format result.
+* [NEW] Set keep to 1 by default instead of 3.
 * [FIX] Update manpage with latest params
 
 --[ Automydumper 1.3.0 ] Release date: 22 march 2021

@@ -1,5 +1,5 @@
 .\" Manpage for automydumper.
-.TH man 8 "26 Jan 2018" "1.2.0" "automydumper man page"
+.TH man 8 "24 Mar 2021" "1.3.1" "automydumper man page"
 .SH NAME
 automydumper \- Automated MySQL backups using Mydumper
 .SH SYNOPSIS
@@ -9,17 +9,19 @@ Automydumper handles backups, retention and rotation for MySQL, Percona Server a
 .PP
 To restore, myloader ( part of the Mydumper package ) should be used. See its manpage for more information (`man myloader`).
 .SH OPTIONS
-The automydumper command does not take any options. It it configured by editing /etc/default/automydumper.
+.TP
+.B -f
+Force a new backup, overwriting any backup with the same name.
+.TP
+.B --force
+Equivalent to -f.
 .SH FILES
 .TP
-/etc/automydumper.cfg
+.B ~/.automydumper.cfg, /etc/automydumper.cfg
 Main configuration file. Uses key=value notation. See VARIABLES chapter in the manpage.
 .TP
-/usr/bin/automydumper
-Wrapper around Mydumper. Main application that handles the actual backing-up and clean of old backups.
-.TP
-/etc/cron.d/automydumper
-Scheduled backup runs by Cron.
+.B /usr/bin/automydumper
+Wrapper around Mydumper. Main application that handles taking the actual backings and clean of old backups.
 .SH VARIABLES
 The following variables can be used in /etc/default/automydumper to customize the automydumper application.
 .TP
@@ -29,15 +31,10 @@ Top directory where backups will be stored.
 Default: /var/backups/automydumper
 .TP
 .B backup_dir_format
-Backups will be stored in directies named by the following format. Use `date --help` to see all possible options. When using '/' inside the format, new directories will be created.
+Backups will be stored in directies named by the following format. Use `date --help` to see all possible options.
+Resulting format can only be letters, numbers, '-', '_' and ':'.
 .br
 Default: +%F
-.TP
-.B logdir
-.br
-Directory that contains the log files that are generated on each run.
-.br
-Default: /var/log/automydumper
 .TP
 .B compress
 Toggle gzip compression of output files. Compression is done on the fly.
@@ -94,16 +91,31 @@ Directory with optional scripts that will be executed AFTER the actual backup. I
 .br
 Default: /usr/share/automydumper/post.d
 .TP
-.B mail_rcpts
-Where to send email reports to. Email addresses should be comma separated, no spaces! Won't send any mails if empty.
+.B use_savepoints
+Append --use-savepoints to mydumper.
 .br
-Default: empty
+Default: 1 (enabled)
 .TP
-.B mail_from
-Sender of the email report.
+.B less_locking
+Append --less-locking to mydumper.
 .br
-Default: automydumper@$HOSTNAME
+Default: 1 (enabled)
+.TP
+.B backup_triggers
+Append --triggers to mydumper.
 .br
+Default: 1 (enabled)
+.TP
+.B backup_events
+Append --events to mydumper.
+.br
+Default: 1 (enabled)
+.TP
+.B backup_routines
+Append --routines to mydumper.
+.br
+Default: 1 (enabled)
+
 .SH RESTORING BACKUPS
 Restoring backups can be done either with myloader, or by manually zcat'ing a table backup to mysql.
 .br

@@ -236,9 +236,9 @@ function show_footer()
 function validate_date_format()
 {
     # Make sure only valid chars are there
-    if ! echo ${formatted_date} | grep -Eq '^[a-zA-Z0-9_-]+$' &> /dev/null; then
+    if ! echo ${formatted_date} | grep -Eq '^[a-zA-Z0-9_:-]+$' &> /dev/null; then
         show_header
-        echo "Critical: date as set in backup_dir_format parameter can only contain numbers, letters, dashes or underscores."
+        echo "Critical: date as set in backup_dir_format parameter can only contain numbers, letters, '-', ':' or '_'."
         exit 1
     fi
 }

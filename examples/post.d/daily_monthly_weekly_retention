@@ -41,6 +41,5 @@ cd ${backup_root_dir}
 for day in $(ls | diff ${ret_days_sorted} - | grep -E '^>' | cut -d' ' -f2 | grep -E "^[0-9]+-[0-9]+-[0-9]+$"); do
     echo "Deleting old backup ${day}"
     rm -rf "${backup_root_dir}/${day}"
-    rm -f "${logdir}/${day}.log"
 done
 rm -f ${ret_days} ${ret_days_sorted}

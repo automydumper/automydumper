@@ -1,3 +1,10 @@
+--[ Automydumper 1.3.2 ] Release date: 29 Jan 2024
+
+* [FIX] script indenting + shellcheck recommendations
+* [FIX] adjusted cleanup of old backups so it doesn't search in nested folders (fix for netapp .snaphots folder)
+* [NEW] Added cleanup_failed_backups option
+* [NEW] Added the --skippy option for mydumper 0.15
+
 --[ Automydumper 1.3.1 ] Release date: 24 march 2021
 
 * [NEW] Quit gracefully and do nothing when a backup is already present. Before we error'ed out, which wasn't a good solution.
@@ -37,7 +44,7 @@
 --[ Automydumper 1.0.1 ] Release date: 12 april 2016
 
 * [FIX] Show the actual version of automydumper instead of %buildNumber%.
-* [NEW] We no longer hardcode the default for mysql_socket. 
+* [NEW] We no longer hardcode the default for mysql_socket.
         Now it will autodetect it through my.cnf, as listed in the [client] section.
 * [NEW] Add rpm .spec file used to build the rpm.
 

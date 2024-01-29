@@ -52,7 +52,7 @@ mysql_auth=(--user="${mysql_user}")
 [[ -n ${mysql_socket} ]] && mysql_auth+=(--socket="${mysql_socket}")
 [[ -z ${mysql_socket} ]] && mysql_auth+=(--host="${mysql_host}")
 
-mydumper_opts+=(-o "${backup_dir}" -v 3 --threads "${threads}")
+mydumper_opts+=(-o "${backup_dir}" -v 3 --dirty --threads "${threads}")
 
 [[ ${compress} -eq 1 ]] && mydumper_opts+=(--compress)
 [[ ${use_savepoints} -eq 1 ]] && mydumper_opts+=(--use-savepoints)

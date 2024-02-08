@@ -2,3 +2,4 @@
 /usr/share/automydumper/pre.d
 /usr/share/automydumper/post.d
 /usr/share/doc/automydumper/examples
+/var/lib/automydumper
